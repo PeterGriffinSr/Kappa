@@ -1,6 +1,0 @@
-description = ""
-requires = "ppx_deriving.runtime"
-archive(byte) = "kappa.cma"
-archive(native) = "kappa.cmxa"
-plugin(byte) = "kappa.cma"
-plugin(native) = "kappa.cmxs"
