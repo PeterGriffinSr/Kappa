@@ -1,0 +1,9 @@
+safe_div := case {
+    (_, 0) => `None ()
+    (x, y) => `Some (<x, y> ; /)
+}
+
+main := <^10, ^2> ; safe_div ; case {
+    `Some result => result ; print
+    `None () => ^"Cannot divide by zero!" ; print
+}

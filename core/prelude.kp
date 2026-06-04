@@ -1,0 +1,17 @@
+dup := <id, id>
+
+pred := <id, ^1> ; -
+succ := <id, ^1> ; +
+
+is_zero := <id, ^0> ; eq
+is_one := <id, ^1> ; eq
+
+not := case {
+    true => false
+    false => true
+}
+
+swap := <snd, fst>
+
+assoc_r := <fst ; fst, <fst ; snd, snd>>
+assoc_l := <<fst, snd ; fst>, snd ; snd>

@@ -1,0 +1,43 @@
+type token =
+    Wildcard
+  | TagName of string
+  | String of string
+  | Star
+  | Snd
+  | Slash
+  | Semicolon
+  | RParen
+  | RBrace
+  | RAngle
+  | Plus
+  | Minus
+  | LParen
+  | LBrace
+  | LAngle
+  | Int of int
+  | Ident of string
+  | Id
+  | Fst
+  | Fix
+  | FatArrow
+  | Eq
+  | EOF
+  | Define
+  | Comma
+  | Case
+  | Caret
+  | Bool of bool
+  | Backslash
+  | BackTick
+  | Arrow
+val menhir_begin_marker : int
+val xv_program : Graph.program
+val xv_pattern : Graph.pattern
+val xv_list_definition_ : Graph.program
+val xv_list_case_branch_ : (Graph.pattern * Graph.graph_node) list
+val xv_expr : Graph.graph_node
+val xv_definition : Graph.definition
+val xv_constant_literal : string
+val xv_case_branch : Graph.pattern * Graph.graph_node
+val xv_atom_expr : Graph.graph_node
+val menhir_end_marker : int
