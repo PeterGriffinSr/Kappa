@@ -1,0 +1,15 @@
+pred := <id, ^1> ; -
+
+fib_step := <snd, <fst, snd> ; +>
+
+fib_iter := fix \self -> (
+    case {
+        (0, acc) => acc
+        (n, acc) =>
+            <fst ; pred,
+             snd ; fib_step> ;
+            self
+    }
+)
+
+fib := <id, ^(0, 1)> ; fib_iter ; fst

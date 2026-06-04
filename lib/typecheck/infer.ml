@@ -24,11 +24,9 @@ let rec infer_pattern = function
   | Graph.PatBool _ -> (Env.empty, Types.TBool)
   | Graph.PatString _ -> (Env.empty, Types.TString)
   | Graph.PatIdent id ->
-      let fresh_in = Types.next_var () in
-      let fresh_out = Types.next_var () in
-      let wire_typ = Types.TArrow (fresh_in, fresh_out) in
-      let local_env = Env.singleton id ([], wire_typ) in
-      (local_env, fresh_out)
+      let captured_rail_typ = Types.next_var () in
+      let local_env = Env.add id ([], captured_rail_typ) Env.empty in
+      (local_env, captured_rail_typ)
   | Graph.PatTuple (p1, p2) ->
       let env1, t1 = infer_pattern p1 in
       let env2, t2 = infer_pattern p2 in
@@ -58,7 +56,14 @@ let rec infer_node ctx node =
       (Subst.empty, TArrow (Types.next_var (), guess))
   | Graph.Var name -> (
       match Env.find_opt name ctx with
-      | Some scheme -> (Subst.empty, Scheme.instantiate scheme)
+      | Some scheme ->
+          let inferred_typ = Scheme.instantiate scheme in
+          begin match inferred_typ with
+          | Types.TArrow (_, _) -> (Subst.empty, inferred_typ)
+          | raw_data_rail ->
+              let current_env_input = Types.next_var () in
+              (Subst.empty, Types.TArrow (current_env_input, raw_data_rail))
+          end
       | None ->
           failwith
             (Printf.sprintf

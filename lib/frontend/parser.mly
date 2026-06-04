@@ -11,7 +11,6 @@ open Graph
 %token Plus Minus Star Slash Eq
 %token EOF
 
-%left Semicolon
 %start <Graph.program> program
 
 %%
@@ -23,8 +22,16 @@ definition:
     | name = Ident; Define; g = expr; { { name = name; graph = g } }
 
 expr:
+    | e = binding_expr { e }
+    | e1 = expr; Semicolon; e2 = binding_expr { Compose(e1, e2) }
+
+binding_expr:
+    | e = tag_expr { e }
+    | Fix; Backslash; v = Ident; Arrow; body = binding_expr { Fix(v, body) }
+
+tag_expr:
     | e = atom_expr { e }
-    | e1 = expr; Semicolon; e2 = expr { Compose(e1, e2) }
+    | BackTick; tag = TagName; e = tag_expr { Tag(tag, e) }
 
 atom_expr:
     | Id { Prim Id }
@@ -36,11 +43,10 @@ atom_expr:
     | Slash { Prim Div }
     | Eq { Prim Eq }
     | Caret; val_str = constant_literal { Constant val_str }
+    | Caret; LParen; l = Int; Comma; r = Int; RParen  { Fanout(Constant (string_of_int l), Constant (string_of_int r)) }
     | name = Ident { Var name }
     | LAngle; left = expr; Comma; right = expr; RAngle { Fanout(left, right) }
-    | Fix; Backslash; v = Ident; Arrow; body = expr { Fix(v, body) }
     | Case; LBrace; branches = list(case_branch); RBrace { Case branches }
-    | BackTick; tag = TagName; e = atom_expr { Tag(tag, e) }
     | LParen; e = expr; RParen { e }
     | LParen; RParen { Constant "()" }
 
@@ -49,7 +55,6 @@ constant_literal:
   | b = Bool { string_of_bool b }
   | s = String { Printf.sprintf "\"%s\"" s }
   | LParen; RParen { "()" }
-  | LParen; l = Int; Comma; r = Int; RParen { Printf.sprintf "(%d,%d)" l r }
 
 case_branch:
   | pat = pattern; FatArrow; body = expr { (pat, body) }
