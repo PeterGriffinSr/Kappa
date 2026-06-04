@@ -1,7 +1,5 @@
 open Types
-module Env = Map.Make (String)
-
-type env = Scheme.t Env.t
+open Kappa_frontend
 
 let infer_prim = function
   | Graph.Id ->
@@ -188,12 +186,12 @@ let rec infer_node ctx node =
       in
       (final_subst, inferred_arrow)
 
-let typecheck_program (prog : Graph.program) : unit =
+let typecheck_program prog =
   let _ =
     List.fold_left
       (fun acc_ctx (def : Graph.definition) ->
         let _, inferred_typ = infer_node acc_ctx def.graph in
         Env.add def.name (Scheme.generalize inferred_typ) acc_ctx)
-      Env.empty prog
+      Env.initial prog
   in
   ()

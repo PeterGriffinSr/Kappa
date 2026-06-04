@@ -1,0 +1,9 @@
+(library
+ (name kappa_frontend)
+ (public_name kappa.frontend)
+ (libraries ppx_deriving.show))
+
+(ocamllex lexer)
+
+(menhir
+ (modules parser))

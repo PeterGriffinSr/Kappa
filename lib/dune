@@ -1,11 +1,4 @@
 (library
  (name kappa)
  (public_name kappa)
- (modules graph lexer parser types subst scheme infer)
- (preprocess
-  (pps ppx_deriving.show)))
-
-(ocamllex lexer)
-
-(menhir
- (modules parser))
+ (libraries kappa_frontend kappa_typecheck))
