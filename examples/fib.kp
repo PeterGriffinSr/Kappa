@@ -1,5 +1,3 @@
-pred := <id, ^1> ; -
-
 fib_step := <snd, <fst, snd> ; +>
 
 fib_iter := fix \self -> (
@@ -13,3 +11,5 @@ fib_iter := fix \self -> (
 )
 
 fib := <id, ^(0, 1)> ; fib_iter ; fst
+
+main := ^90 ; fib

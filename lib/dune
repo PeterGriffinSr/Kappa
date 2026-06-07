@@ -1,4 +1,4 @@
 (library
  (name kappa)
  (public_name kappa)
- (libraries kappa_frontend kappa_typecheck))
+ (libraries kappa_frontend kappa_typecheck kappa_vm))

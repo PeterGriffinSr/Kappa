@@ -5,7 +5,7 @@ open Graph
 %token <int> Int
 %token <bool> Bool
 %token <string> Ident String TagName
-%token Id Fix Case Snd Fst BackTick Wildcard
+%token Id Fix Case Snd Fst FFI BackTick Wildcard
 %token Define Semicolon LAngle RAngle Comma Caret Backslash Arrow FatArrow
 %token LBrace RBrace LParen RParen
 %token Plus Minus Star Slash Eq
@@ -65,6 +65,6 @@ pattern:
   | s = String { PatString s }
   | id = Ident { PatIdent id }
   | Wildcard { PatWildcard }
-  | LParen; RParen { PatTuple(PatWildcard, PatWildcard) }
+  | LParen; RParen { PatUnit }
   | LParen; l = pattern; Comma; r = pattern; RParen { PatTuple(l, r) }
   | BackTick; tag = TagName; pat = pattern { PatTag(tag, pat) }

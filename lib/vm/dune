@@ -1,0 +1,6 @@
+(library
+ (name kappa_vm)
+ (public_name kappa.vm)
+ (libraries kappa_frontend)
+ (preprocess
+  (pps ppx_deriving.show)))

@@ -19,6 +19,7 @@ and pattern =
   | PatIdent of string
   | PatTag of string * pattern
   | PatWildcard
+  | PatUnit
 [@@deriving show]
 
 type definition = { name : string; graph : graph_node } [@@deriving show]

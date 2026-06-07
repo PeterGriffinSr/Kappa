@@ -9,6 +9,7 @@ let find_opt name env = StringMap.find_opt name env
 let add name scheme env = StringMap.add name scheme env
 let map f env = StringMap.map f env
 let union f env1 env2 = StringMap.union f env1 env2
+let fold f env acc = StringMap.fold f env acc
 
 let initial =
   let print_type = Types.TArrow (Types.next_var (), Types.TUnit) in

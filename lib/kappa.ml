@@ -6,3 +6,5 @@ module Env = Kappa_typecheck.Env
 module Subst = Kappa_typecheck.Subst
 module Scheme = Kappa_typecheck.Scheme
 module Infer = Kappa_typecheck.Infer
+module Combinator = Kappa_vm.Combinator
+module Compiler = Kappa_vm.Compiler

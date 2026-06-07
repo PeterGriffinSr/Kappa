@@ -45,13 +45,17 @@ let rec infer_pattern = function
       let row_tail = Types.next_var () in
       (local_env, Types.TRowExtend (tag, inner_typ, row_tail))
   | Graph.PatWildcard -> (Env.empty, Types.next_var ())
+  | Graph.PatUnit -> (Env.empty, Types.TUnit)
 
 let rec infer_node ctx node =
   match node with
   | Graph.Prim p -> (Subst.empty, infer_prim p)
   | Graph.Constant s ->
       let guess =
-        if String.length s >= 2 && s.[0] = '"' then TString else TInt
+        match s with
+        | "()" -> TUnit
+        | _ when String.length s >= 2 && s.[0] = '"' -> TString
+        | _ -> TInt
       in
       (Subst.empty, TArrow (Types.next_var (), guess))
   | Graph.Var name -> (
@@ -138,31 +142,27 @@ let rec infer_node ctx node =
         in
         let body_subst, body_typ = infer_node branch_ctx body in
 
-        let current_in_typ =
+        let current_in =
           Subst.apply body_subst (Subst.apply accumulated_subst fresh_in)
         in
-        let s_in =
-          Subst.unify current_in_typ (Subst.apply body_subst pat_typ)
-        in
+        let s_in = Subst.unify current_in (Subst.apply body_subst pat_typ) in
+        let subst_so_far = Subst.compose s_in body_subst in
 
-        let unified_subst = Subst.compose s_in body_subst in
-        let current_out_typ =
-          Subst.apply unified_subst (Subst.apply accumulated_subst fresh_out)
+        let current_out =
+          Subst.apply subst_so_far (Subst.apply accumulated_subst fresh_out)
         in
-
-        let expected_arrow =
-          Types.TArrow (Subst.apply unified_subst pat_typ, current_out_typ)
+        let body_out =
+          match Subst.apply subst_so_far body_typ with
+          | Types.TArrow (_, o) -> o
+          | t -> t
         in
-        let s_out =
-          Subst.unify (Subst.apply unified_subst body_typ) expected_arrow
-        in
+        let s_out = Subst.unify body_out current_out in
 
-        let total_branch_subst = Subst.compose s_out unified_subst in
-        let next_subst = Subst.compose total_branch_subst accumulated_subst in
-
+        let total_subst = Subst.compose s_out subst_so_far in
+        let next_subst = Subst.compose total_subst accumulated_subst in
         let next_ctx =
           Env.map
-            (fun (vars, t) -> (vars, Subst.apply total_branch_subst t))
+            (fun (vars, t) -> (vars, Subst.apply total_subst t))
             running_ctx
         in
         (next_subst, next_ctx)
@@ -192,11 +192,23 @@ let rec infer_node ctx node =
       (final_subst, inferred_arrow)
 
 let typecheck_program prog =
+  let ctx_free_vars ctx =
+    Env.fold
+      (fun _ (bound, t) acc ->
+        let scheme_free =
+          Scheme.free_vars t |> List.filter (fun v -> not (List.mem v bound))
+        in
+        scheme_free @ acc)
+      ctx []
+  in
   let _ =
     List.fold_left
       (fun acc_ctx (def : Graph.definition) ->
         let _, inferred_typ = infer_node acc_ctx def.graph in
-        Env.add def.name (Scheme.generalize inferred_typ) acc_ctx)
+        let bound = ctx_free_vars acc_ctx in
+        Env.add def.name
+          (Scheme.generalize ~bound_vars:bound inferred_typ)
+          acc_ctx)
       Env.initial prog
   in
   ()

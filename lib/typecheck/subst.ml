@@ -3,22 +3,24 @@ module IntMap = Map.Make (Int)
 
 type t = Types.t IntMap.t
 
-let empty : t = IntMap.empty
+let empty = IntMap.empty
 
 let rec apply s = function
   | TVar v -> (
       match IntMap.find_opt v s with Some typ -> apply s typ | None -> TVar v)
   | TProd (t1, t2) -> TProd (apply s t1, apply s t2)
   | TArrow (t1, t2) -> TArrow (apply s t1, apply s t2)
+  | TRowExtend (tag, t, tail) -> TRowExtend (tag, apply s t, apply s tail)
   | other -> other
 
 let compose s1 s2 =
   let merged = IntMap.map (fun typ -> apply s1 typ) s2 in
-  IntMap.union (fun _ _ v2 -> Some v2) s1 merged
+  IntMap.union (fun _ v1 _ -> Some v1) s1 merged
 
 let rec occurs_check v = function
   | TVar v' -> v = v'
   | TProd (t1, t2) | TArrow (t1, t2) -> occurs_check v t1 || occurs_check v t2
+  | TRowExtend (_, t, tail) -> occurs_check v t || occurs_check v tail
   | _ -> false
 
 let rec unify t1 t2 =

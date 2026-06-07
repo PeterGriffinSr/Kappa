@@ -21,7 +21,7 @@
  (name kappa)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml)
+ (depends ocaml dune ocamllex menhir ctypes ctypes-foreign)
  (tags
   ("add topics" "to describe" your project)))
 

@@ -2,7 +2,7 @@
 
 This language is inspired from $\kappa$-calculus
 
-**Kappa ($\kappa$)** is an experimental programming language designed to explore a functional paradigm completely free of runtime closures. While traditional functional languages rely on the $\lambda$-calculus, Kappa shifts the foundational mathematics to **Contextually Complete Categories**, turning functions into pure structural data pipelines.
+**Kappa ($\kappa$)** is an experimental (POC) programming language designed to explore a functional paradigm completely free of runtime closures. While traditional functional languages rely on $\lambda$-calculus, Kappa shifts the foundational mathematics to **Contextually Complete Categories**, turning functions into pure structural data pipelines.
 
 ---
 
